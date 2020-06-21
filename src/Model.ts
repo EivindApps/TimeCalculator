@@ -80,3 +80,32 @@ export class TimeValue implements ICalculationPart {
         }
     }
 }
+
+export enum Operations {
+    add = 1,
+    substract = 2,
+    eq = 3
+}
+
+export class Operator implements ICalculationPart {
+    public op: Operations;
+
+    constructor(op: Operations | string) {
+        if (typeof op === "string") {
+            this.op = this.parseOperationFromString(op);
+        } else {
+            this.op = op;
+        }
+    }
+
+    private parseOperationFromString(op: string): Operations {
+        switch(op) {
+            case '+':
+                return Operations.add;
+            case '-':
+                return Operations.substract;
+            default:
+                throw `Operator '${op}' not supported.`;
+        }
+    }
+}

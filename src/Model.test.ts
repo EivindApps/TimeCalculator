@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import moment from 'moment';
-import { TimeValue, CalculatorTimeFormat } from './Model';
+import { TimeValue, CalculatorTimeFormat, Operations, Operator } from './Model';
 import { EPERM } from 'constants';
 
 describe('TimeValue', () => {
@@ -83,5 +83,19 @@ describe('TimeValue', () => {
             existingValue.changeTimeFormat(CalculatorTimeFormat.HoursAndMinutes);
             assertStringEqual(existingValue, expectedResult);
         })
+    });
+});
+
+describe('Operator', () => {
+    describe('constructor for string should parse to Operations', () => {
+        it('should parse "+" to add', () => {
+            assert.equal(new Operator('+').op, Operations.add);
+        });
+        it('should parse "-" to subtract', () => {
+            assert.equal(new Operator('-').op, Operations.substract);
+        })
+        it('should throw Operator {op} not supported on any other string', () => {
+            expect(() => new Operator('=')).toThrow("Operator '=' not supported.");
+        });
     });
 });
