@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import moment from 'moment';
-import { TimeValue, CalculatorTimeFormat, Operations, Operator } from './Model';
+import { TimeValue, CalculatorTimeFormat, Operations, Operator, Calculation } from './Model';
 import { EPERM } from 'constants';
 
 describe('TimeValue', () => {
@@ -96,6 +96,61 @@ describe('Operator', () => {
         })
         it('should throw Operator {op} not supported on any other string', () => {
             expect(() => new Operator('=')).toThrow("Operator '=' not supported.");
+        });
+    });
+});
+
+describe('Calculation', () => {
+    const createCalculationHoursAndMinutes = (parts: Array<string>) => {
+        const calc = new Calculation();
+        for(let partIndex = 0; partIndex < parts.length; partIndex++) {
+            if (partIndex % 2 === 1) {
+                calc.push(new Operator(parts[partIndex]));
+            } else {
+                calc.push(new TimeValue(parts[partIndex], CalculatorTimeFormat.HoursAndMinutes));
+            }
+        }
+        return calc;
+    };
+    const assertStringEqual = (actual: moment.Duration, expected: moment.Duration) => assert.equal(actual.toISOString(), expected.toISOString());
+    describe('calculate for add operations', () => {
+        it('should add two minute values like "05 + 06 = 11"', () => {
+            const expected = moment.duration(11, 'm');
+            const calculation = createCalculationHoursAndMinutes(['05', '+', '06']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
+        });
+        it('should add two hour and minute values like "10:20 + 10:40 = 21:00"', () => {
+            const expected = moment.duration(21, 'h');
+            const calculation = createCalculationHoursAndMinutes(['10:20', '+', '10:40']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
+        });
+        it('should add three values like "10:15 + 15 + 20:00 = 30:30"', () => {
+            const expected = moment.duration(30, 'h').add(30, 'm');
+            const calculation = createCalculationHoursAndMinutes(['10:15', '+', '15', '+', '20:00']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
+        });
+    });
+    describe('calculate for subtract operations', () => {
+        it('should subtract to minute values like "11 - 05 = 6"', () => {
+            const expected = moment.duration(6, 'm');
+            const calculation = createCalculationHoursAndMinutes(['11', '-', '05']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
+        });
+        it('should subtract two hour and minute values like "21:00 - 10:20 = 10:40"', () => {
+            const expected = moment.duration(10, 'h').add(40, 'm');
+            const calculation = createCalculationHoursAndMinutes(['21:00', '-', '10:20']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
+        });
+        it('should subtract three values like "30:30 - 10:15 - 15 = 20:00"', () => {
+            const expected = moment.duration(20, 'h');
+            const calculation = createCalculationHoursAndMinutes(['30:30', '-', '10:15', '-', '15']);
+            const actual = calculation.calculate();
+            assertStringEqual(actual, expected);
         });
     });
 });

@@ -109,3 +109,44 @@ export class Operator implements ICalculationPart {
         }
     }
 }
+
+export class Calculation extends Array<ICalculationPart> {
+    public calculate(): moment.Duration {
+        let currentValue = moment.duration(0, 's');
+        let currentOp: Operations | undefined;
+
+        for(let part of this) {
+            if (part instanceof Operator) {
+                currentOp = part.op;
+            } else if (part instanceof TimeValue) {
+                if (currentOp === undefined) {
+                    currentValue = part.value;
+                } else {
+                    currentValue = this.calculateInternal(currentValue, currentOp, part.value);
+                    currentOp = undefined;
+                }
+            }
+        }
+
+        return currentValue;
+    }
+
+    private calculateInternal(left: moment.Duration, op: Operations, right: moment.Duration): moment.Duration {
+        switch(op) {
+            case Operations.add:
+                return left.add(right);
+            case Operations.substract:
+                return left.subtract(right);
+        }
+
+        throw `Operation '${op}' not supported.`;
+    }
+
+    public changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
+        for(let part of this) {
+            if (part instanceof TimeValue) {
+                part.changeTimeFormat(timeFormat);
+            }
+        }
+    }
+}
