@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import moment from 'moment';
 import { TimeValue, CalculatorTimeFormat } from './Model';
+import { EPERM } from 'constants';
 
 describe('TimeValue', () => {
     const duration0 = moment.duration(0, 'ms');
@@ -60,5 +61,27 @@ describe('TimeValue', () => {
         it('should parse "20:04:34" as 20 hours, four minutes and 34 seconds', () => {
             assertStringEqual(timeValueWithSeconds('20:04:34'), moment.duration(20, 'h').add(4, 'm').add(34, 's'));
         });
+    });
+    describe('changeTimeFormat to HoursMinutesAndSeconds', () => {
+        it('should keep value for both hours and minutes', () => {
+            let existingValue = new TimeValue('20:50', CalculatorTimeFormat.HoursAndMinutes);
+            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            existingValue.changeTimeFormat(CalculatorTimeFormat.HoursMinutesAndSeconds);
+            assertStringEqual(existingValue, expectedResult);
+        });
+    });
+    describe('changeTimeFormat to HourAndMinutes', () => {
+        it('should keep value for both hours and minutes', () => {
+            let existingValue = new TimeValue('20:50:00', CalculatorTimeFormat.HoursMinutesAndSeconds);
+            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            existingValue.changeTimeFormat(CalculatorTimeFormat.HoursAndMinutes);
+            assertStringEqual(existingValue, expectedResult);
+        });
+        it('should drop seconds but keep hours and minutes', () => {
+            let existingValue = new TimeValue('20:50:10', CalculatorTimeFormat.HoursMinutesAndSeconds);
+            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            existingValue.changeTimeFormat(CalculatorTimeFormat.HoursAndMinutes);
+            assertStringEqual(existingValue, expectedResult);
+        })
     });
 });

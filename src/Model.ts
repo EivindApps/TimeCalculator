@@ -71,4 +71,12 @@ export class TimeValue implements ICalculationPart {
         var value = moment.duration(hours, "h").add(minutes, "m").add(secods, "s");
         return (isNegative ? moment.duration(value.asMilliseconds() * -1, "ms") : moment.duration(value.asMilliseconds()));
     }
+
+    public changeTimeFormat(timeFormat: CalculatorTimeFormat) {
+        this._timeFormat = timeFormat;
+
+        if (timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
+            this.value = moment.duration(this.value.hours(), 'h').add(this.value.minutes(), 'm');
+        }
+    }
 }
