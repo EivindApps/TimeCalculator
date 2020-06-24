@@ -1,7 +1,6 @@
-import * as assert from 'assert';
+import * as assert from 'chai';
 import moment from 'moment';
-import { TimeValue, CalculatorTimeFormat, Operations, Operator, Calculation } from './Model';
-import { EPERM } from 'constants';
+import { TimeValue, CalculatorTimeFormat, Operations, Operator, Calculation } from '../../src/Model';
 
 describe('TimeValue', () => {
     const duration0 = moment.duration(0, 'ms');
@@ -9,7 +8,7 @@ describe('TimeValue', () => {
     const duration1min = moment.duration(1, 'm');
     const timeValueHoursMinutes = (displayValue: string) => new TimeValue(displayValue, CalculatorTimeFormat.HoursAndMinutes);
     const timeValueWithSeconds = (displayValue: string) => new TimeValue(displayValue, CalculatorTimeFormat.HoursMinutesAndSeconds);
-    const assertStringEqual = (actual: TimeValue, expected: moment.Duration) => assert.equal(actual.value.toISOString(), expected.toISOString());
+    const assertStringEqual = (actual: TimeValue, expected: moment.Duration) => assert.expect(actual.value.toISOString()).to.equal(expected.toISOString());
     describe('constructor for hours and minutes', () => {
         it('should parse blank display to duration 0', () => {
             assertStringEqual(timeValueHoursMinutes(''), duration0);
@@ -64,22 +63,22 @@ describe('TimeValue', () => {
     });
     describe('changeTimeFormat to HoursMinutesAndSeconds', () => {
         it('should keep value for both hours and minutes', () => {
-            let existingValue = new TimeValue('20:50', CalculatorTimeFormat.HoursAndMinutes);
-            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            const existingValue = new TimeValue('20:50', CalculatorTimeFormat.HoursAndMinutes);
+            const expectedResult = moment.duration(20, 'h').add(50, 'm');
             existingValue.changeTimeFormat(CalculatorTimeFormat.HoursMinutesAndSeconds);
             assertStringEqual(existingValue, expectedResult);
         });
     });
     describe('changeTimeFormat to HourAndMinutes', () => {
         it('should keep value for both hours and minutes', () => {
-            let existingValue = new TimeValue('20:50:00', CalculatorTimeFormat.HoursMinutesAndSeconds);
-            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            const existingValue = new TimeValue('20:50:00', CalculatorTimeFormat.HoursMinutesAndSeconds);
+            const expectedResult = moment.duration(20, 'h').add(50, 'm');
             existingValue.changeTimeFormat(CalculatorTimeFormat.HoursAndMinutes);
             assertStringEqual(existingValue, expectedResult);
         });
         it('should drop seconds but keep hours and minutes', () => {
-            let existingValue = new TimeValue('20:50:10', CalculatorTimeFormat.HoursMinutesAndSeconds);
-            let expectedResult = moment.duration(20, 'h').add(50, 'm');
+            const existingValue = new TimeValue('20:50:10', CalculatorTimeFormat.HoursMinutesAndSeconds);
+            const expectedResult = moment.duration(20, 'h').add(50, 'm');
             existingValue.changeTimeFormat(CalculatorTimeFormat.HoursAndMinutes);
             assertStringEqual(existingValue, expectedResult);
         })
@@ -89,13 +88,13 @@ describe('TimeValue', () => {
 describe('Operator', () => {
     describe('constructor for string should parse to Operations', () => {
         it('should parse "+" to add', () => {
-            assert.equal(new Operator('+').op, Operations.add);
+            assert.expect(new Operator('+').op).to.equal(Operations.add);
         });
         it('should parse "-" to subtract', () => {
-            assert.equal(new Operator('-').op, Operations.substract);
+            assert.expect(new Operator('-').op).to.equal(Operations.substract);
         })
         it('should throw Operator {op} not supported on any other string', () => {
-            expect(() => new Operator('=')).toThrow("Operator '=' not supported.");
+            assert.expect(() => new Operator('=')).to.throw("Operator '=' not supported.");
         });
     });
 });
@@ -112,7 +111,7 @@ describe('Calculation', () => {
         }
         return calc;
     };
-    const assertStringEqual = (actual: moment.Duration, expected: moment.Duration) => assert.equal(actual.toISOString(), expected.toISOString());
+    const assertStringEqual = (actual: moment.Duration, expected: moment.Duration) => assert.expect(actual.toISOString()).to.equal(expected.toISOString());
     describe('calculate for add operations', () => {
         it('should add two minute values like "05 + 06 = 11"', () => {
             const expected = moment.duration(11, 'm');

@@ -1,3 +1,14 @@
+<template>
+  <div id="app">
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </div>
+    <router-view id="router-view"/>
+  </div>
+</template>
+
+<style lang="scss">
 html {
   box-sizing: border-box;
   height: 100%
@@ -13,9 +24,30 @@ body {
   box-sizing: inherit;
 }
 
-#root {
+#app {
   height: 100%;
+  display: grid;
+  grid-template-rows: 60px 1fr;
 }
+
+#nav {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+#router-view {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+#home {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
 
 .Calculator {
   height: 100%;
@@ -58,3 +90,4 @@ body {
   position: relative;
   background-color: #efefef;
 }
+</style>

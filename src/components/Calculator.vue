@@ -1,18 +1,51 @@
-import moment from 'moment';
-import { CalculatorTimeFormat, Calculation, Operations, TimeValue, Operator } from "./Model";
-import { threadId } from 'worker_threads';
+<template>
+  <div className="Calculator">
+      <div className="CalculatorDisplayContainer">
+        <input type="text" className="CurrentCalculation" disabled v-model="this.CalculatorDisplay" />
+        <input type="text" className="CalculatorDisplay" disabled v-model="this.CalculatorDisplay" />
+      </div>
+      <div className="CalculatorPad">
+        <div className="CalculatorButton" v-on:click="clearDisplay">CE</div>
+        <div className="CalculatorButton" v-on:click="clearAll">C</div>
+        <div className="CalculatorButton" v-on:click="backspace">&#x21A4;</div>
+        <div className="NoCalculatorButton"></div>
+        <div className="CalculatorButton" v-on:click="num7">7</div>
+        <div className="CalculatorButton" v-on:click="num8">8</div>
+        <div className="CalculatorButton" v-on:click="num9">9</div>
+        <div className="NoCalculatorButton"></div>
+        <div className="CalculatorButton" v-on:click="num4">4</div>
+        <div className="CalculatorButton" v-on:click="num5">5</div>
+        <div className="CalculatorButton" v-on:click="num6">6</div>
+        <div className="CalculatorButton" v-on:click="minus">&#x2212;</div>
+        <div className="CalculatorButton" v-on:click="num1">1</div>
+        <div className="CalculatorButton" v-on:click="num2">2</div>
+        <div className="CalculatorButton" v-on:click="num3">3</div>        
+        <div className="CalculatorButton" v-on:click="plus">+</div>
+        <div className="CalculatorButton" v-on:click="negate">&#x2213;</div>
+        <div className="CalculatorButton" v-on:click="num0">0</div>
+        <div className="CalculatorButton" v-on:click="separator">:</div>
+        <div className="CalculatorButton" v-on:click="equal">=</div>
+      </div>
+    </div>
+</template>
 
-export class CalculatorViewModel {
-    private _overwriteDisplay: boolean = false;
-    private _hasPressedNumber: boolean = false;
-    private _separatorSetExplicitly: boolean = false;
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import moment from 'moment';
+import { CalculatorTimeFormat, Calculation, Operations, TimeValue, Operator } from "../Model";
+
+@Component
+export default class Calculator extends Vue {
+  private _overwriteDisplay = false;
+    private _hasPressedNumber = false;
+    private _separatorSetExplicitly = false;
 
     public CalculatorType: CalculatorTimeFormat = CalculatorTimeFormat.HoursAndMinutes;
 
     private _currentCalculation: Calculation = new Calculation();
     public get CurrentCalculation(): string { return this._currentCalculation.toString(); }
 
-    public CalculatorDisplay: string = '';
+    public CalculatorDisplay = '';
 
     private changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
         this.CalculatorType = timeFormat;
@@ -288,7 +321,7 @@ export class CalculatorViewModel {
             temp = temp.substr(0, temp.length - 1);
 
             // Don't leave a separator at the end
-            if (temp.length > 0 && temp.lastIndexOf(':') == (temp.le - 1)) {
+            if (temp.length > 0 && temp.lastIndexOf(':') == (temp.length - 1)) {
                 this._separatorSetExplicitly = false;
                 temp = temp.substr(0, temp.length - 1);
             }
@@ -329,3 +362,4 @@ export class CalculatorViewModel {
     }
     //#endregion
 }
+</script>

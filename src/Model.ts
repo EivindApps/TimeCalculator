@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-export interface ICalculationPart {
-
+export interface CalculationPart {
+    dumb(): void;
 }
 
 export enum CalculatorTimeFormat {
@@ -9,7 +9,7 @@ export enum CalculatorTimeFormat {
     HoursMinutesAndSeconds
 }
 
-export class TimeValue implements ICalculationPart {
+export class TimeValue implements CalculationPart {
     private _timeFormat: CalculatorTimeFormat;
     public value: moment.Duration;
 
@@ -24,14 +24,14 @@ export class TimeValue implements ICalculationPart {
     }
 
     private parseDurationFromString(displayValue: string): moment.Duration {
-        var hours, minutes, secods: number = 0;
-        var isNegative: boolean = (displayValue !== "" && displayValue !== undefined && displayValue.substr(0, 1) === "-");
+        let hours = 0, minutes = 0, seconds = 0;
+        const isNegative: boolean = (displayValue !== "" && displayValue !== undefined && displayValue.substr(0, 1) === "-");
 
         if (displayValue !== undefined && displayValue !== "") {
             if (isNegative) displayValue = displayValue.substr(1);  // Parse only positive values
 
             if (displayValue.indexOf(":") !== -1) {
-                var parts = displayValue.split(":");
+                const parts = displayValue.split(":");
 
                 if (this._timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
                     hours = parseInt(parts[0]);
@@ -44,7 +44,7 @@ export class TimeValue implements ICalculationPart {
                         minutes = parseInt(parts[0]);
 
                         if (parts[1] !== undefined && parts[1] !== "") {
-                            secods = parseInt(parts[1]);
+                            seconds = parseInt(parts[1]);
                         }
                     } else if (parts.length === 3) {
                         hours = parseInt(parts[0]);
@@ -54,7 +54,7 @@ export class TimeValue implements ICalculationPart {
                         }
 
                         if (parts[2] !== undefined && parts[2] !== "") {
-                            secods = parseInt(parts[2]);
+                            seconds = parseInt(parts[2]);
                         }
                     }
                 }
@@ -63,12 +63,12 @@ export class TimeValue implements ICalculationPart {
                 if (this._timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
                     minutes = parseInt(displayValue);
                 } else {
-                    secods = parseInt(displayValue);
+                    seconds = parseInt(displayValue);
                 }
             }
         }
 
-        var value = moment.duration(hours, "h").add(minutes, "m").add(secods, "s");
+        const value = moment.duration(hours, "h").add(minutes, "m").add(seconds, "s");
         return (isNegative ? moment.duration(value.asMilliseconds() * -1, "ms") : moment.duration(value.asMilliseconds()));
     }
 
@@ -79,6 +79,10 @@ export class TimeValue implements ICalculationPart {
             this.value = moment.duration(this.value.hours(), 'h').add(this.value.minutes(), 'm');
         }
     }
+
+    public dumb(): void {
+        console.log('');
+    }
 }
 
 export enum Operations {
@@ -87,7 +91,7 @@ export enum Operations {
     eq = 3
 }
 
-export class Operator implements ICalculationPart {
+export class Operator implements CalculationPart {
     public op: Operations;
 
     constructor(op: Operations | string) {
@@ -108,14 +112,18 @@ export class Operator implements ICalculationPart {
                 throw `Operator '${op}' not supported.`;
         }
     }
+
+    public dumb(): void {
+        console.log('');
+    }
 }
 
-export class Calculation extends Array<ICalculationPart> {
+export class Calculation extends Array<CalculationPart> {
     public calculate(): moment.Duration {
         let currentValue = moment.duration(0, 's');
         let currentOp: Operations | undefined;
 
-        for(let part of this) {
+        for(const part of this) {
             if (part instanceof Operator) {
                 currentOp = part.op;
             } else if (part instanceof TimeValue) {
@@ -143,7 +151,7 @@ export class Calculation extends Array<ICalculationPart> {
     }
 
     public changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
-        for(let part of this) {
+        for(const part of this) {
             if (part instanceof TimeValue) {
                 part.changeTimeFormat(timeFormat);
             }
