@@ -1,11 +1,11 @@
 <template>
-  <div className="Calculator">
-      <div className="CalculatorDisplayContainer">
-        <input type="text" className="CurrentCalculation" disabled v-model="this.CalculatorDisplay" />
-        <input type="text" className="CalculatorDisplay" disabled v-model="this.CalculatorDisplay" />
+  <div className="calculator" id="calculator">
+      <div className="calculatorDisplayContainer" id="calculatorDisplayContainer">
+        <input type="text" className="currentCalculation" id="currentCalculation" disabled v-model="this.CalculatorDisplay" />
+        <input type="text" className="calculatorDisplay" id="calculatorDisplay" disabled v-model="this.CalculatorDisplay" />
       </div>
-      <div className="CalculatorPad">
-        <div className="CalculatorButton" v-on:click="clearDisplay">CE</div>
+      <div className="calculatorPad" id="calculatorPad">
+        <div className="calculatorButton" v-on:click="clearDisplay" id="calculatorButton">CE</div>
         <div className="CalculatorButton" v-on:click="clearAll">C</div>
         <div className="CalculatorButton" v-on:click="backspace">&#x21A4;</div>
         <div className="NoCalculatorButton"></div>
@@ -18,13 +18,13 @@
         <div className="CalculatorButton" v-on:click="num6">6</div>
         <div className="CalculatorButton" v-on:click="minus">&#x2212;</div>
         <div className="CalculatorButton" v-on:click="num1">1</div>
-        <div className="CalculatorButton" v-on:click="num2">2</div>
-        <div className="CalculatorButton" v-on:click="num3">3</div>        
-        <div className="CalculatorButton" v-on:click="plus">+</div>
-        <div className="CalculatorButton" v-on:click="negate">&#x2213;</div>
-        <div className="CalculatorButton" v-on:click="num0">0</div>
-        <div className="CalculatorButton" v-on:click="separator">:</div>
-        <div className="CalculatorButton" v-on:click="equal">=</div>
+        <div className="calculatorButton" v-on:click="num2">2</div>
+        <div className="calculatorButton" v-on:click="num3">3</div>        
+        <div className="calculatorButton" v-on:click="plus">+</div>
+        <div className="calculatorButton" v-on:click="negate">&#x2213;</div>
+        <div className="calculatorButton" v-on:click="num0">0</div>
+        <div className="calculatorButton" v-on:click="separator">:</div>
+        <div className="calculatorButton" v-on:click="equal">=</div>
       </div>
     </div>
 </template>
@@ -241,11 +241,12 @@ export default class Calculator extends Vue {
         this._separatorSetExplicitly = false;
     }
 
-    private formatCalculation(value: moment.Duration): string {
-        const isNeagtive = value.asMilliseconds() < 0;
+    private formatCalculation(value: string): string {
+        let durationValue = moment.duration(value);
+        const isNeagtive = durationValue.asMilliseconds() < 0;
 
         if (isNeagtive === true) {
-            value = moment.duration(value.asMilliseconds() * -1);
+            durationValue = moment.duration(durationValue.asMilliseconds() * -1);
         }
 
         function formatAsTwoDigits(str: string): string {
@@ -257,10 +258,10 @@ export default class Calculator extends Vue {
         }
 
         if (this.CalculatorType === CalculatorTimeFormat.HoursAndMinutes) {
-            return (isNeagtive ? '-' : '') + formatAsTwoDigits(value.asHours.toString()) + ':' + formatAsTwoDigits(value.minutes.toString());
+            return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.asHours.toString()) + ':' + formatAsTwoDigits(durationValue.minutes.toString());
         }
 
-        return (isNeagtive ? '-' : '') + formatAsTwoDigits(value.asHours.toString()) + ':' + formatAsTwoDigits(value.minutes.toString() + ':' + formatAsTwoDigits(value.seconds.toString()));
+        return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.asHours.toString()) + ':' + formatAsTwoDigits(durationValue.minutes.toString() + ':' + formatAsTwoDigits(durationValue.seconds.toString()));
     }
 
     //#region Keypad
@@ -363,3 +364,48 @@ export default class Calculator extends Vue {
     //#endregion
 }
 </script>
+
+<style lang="css" scoped>
+#calculator {
+  background-color: green;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1.75fr;
+}
+
+#calculatorDisplayContainer {
+  display: grid;
+  grid-template-rows: 1fr 2fr;
+}
+
+#currentCalculation {
+  background-color: white;
+  border: none;
+  font-size: 32px;
+  text-align: right;
+}
+
+#calculatorDisplay {
+  background-color: white;
+  border: none;
+  font-size: 60px;
+  font-weight: 400;
+  text-align: right;
+  color: black;
+}
+
+#calculatorPad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.calculatorButton {
+  display: flex;
+  font-size: 26px;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #efefef;
+}
+</style>

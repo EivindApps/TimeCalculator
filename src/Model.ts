@@ -119,7 +119,7 @@ export class Operator implements CalculationPart {
 }
 
 export class Calculation extends Array<CalculationPart> {
-    public calculate(): moment.Duration {
+    public calculate(): string {
         let currentValue = moment.duration(0, 's');
         let currentOp: Operations | undefined;
 
@@ -136,7 +136,7 @@ export class Calculation extends Array<CalculationPart> {
             }
         }
 
-        return currentValue;
+        return currentValue.toISOString();
     }
 
     private calculateInternal(left: moment.Duration, op: Operations, right: moment.Duration): moment.Duration {

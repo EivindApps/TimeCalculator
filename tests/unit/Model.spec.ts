@@ -111,7 +111,7 @@ describe('Calculation', () => {
         }
         return calc;
     };
-    const assertStringEqual = (actual: moment.Duration, expected: moment.Duration) => assert.expect(actual.toISOString()).to.equal(expected.toISOString());
+    const assertStringEqual = (actual: string, expected: moment.Duration) => assert.expect(actual).to.equal(expected.toISOString());
     describe('calculate for add operations', () => {
         it('should add two minute values like "05 + 06 = 11"', () => {
             const expected = moment.duration(11, 'm');
