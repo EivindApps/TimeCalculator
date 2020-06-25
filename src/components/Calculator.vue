@@ -1,30 +1,30 @@
 <template>
-  <div className="calculator" id="calculator">
-      <div className="calculatorDisplayContainer" id="calculatorDisplayContainer">
-        <input type="text" className="currentCalculation" id="currentCalculation" disabled v-model="this.CalculatorDisplay" />
-        <input type="text" className="calculatorDisplay" id="calculatorDisplay" disabled v-model="this.CalculatorDisplay" />
+  <div class="calculator" v-on:keyup="keyUp($event)">
+      <div class="calculatorDisplayContainer">
+        <input type="text" class="currentCalculation" disabled v-model="this.currentCalculationDisplay" />
+        <input type="text" class="calculatorDisplay" disabled v-model="this.CalculatorDisplay" />
       </div>
-      <div className="calculatorPad" id="calculatorPad">
-        <div className="calculatorButton" v-on:click="clearDisplay" id="calculatorButton">CE</div>
-        <div className="CalculatorButton" v-on:click="clearAll">C</div>
-        <div className="CalculatorButton" v-on:click="backspace">&#x21A4;</div>
-        <div className="NoCalculatorButton"></div>
-        <div className="CalculatorButton" v-on:click="num7">7</div>
-        <div className="CalculatorButton" v-on:click="num8">8</div>
-        <div className="CalculatorButton" v-on:click="num9">9</div>
-        <div className="NoCalculatorButton"></div>
-        <div className="CalculatorButton" v-on:click="num4">4</div>
-        <div className="CalculatorButton" v-on:click="num5">5</div>
-        <div className="CalculatorButton" v-on:click="num6">6</div>
-        <div className="CalculatorButton" v-on:click="minus">&#x2212;</div>
-        <div className="CalculatorButton" v-on:click="num1">1</div>
-        <div className="calculatorButton" v-on:click="num2">2</div>
-        <div className="calculatorButton" v-on:click="num3">3</div>        
-        <div className="calculatorButton" v-on:click="plus">+</div>
-        <div className="calculatorButton" v-on:click="negate">&#x2213;</div>
-        <div className="calculatorButton" v-on:click="num0">0</div>
-        <div className="calculatorButton" v-on:click="separator">:</div>
-        <div className="calculatorButton" v-on:click="equal">=</div>
+      <div class="calculatorPad">
+        <div class="calculatorButton" v-on:click="clearDisplay">CE</div>
+        <div class="calculatorButton" v-on:click="clearAll">C</div>
+        <div class="calculatorButton" v-on:click="backspace">&#x21A4;</div>
+        <div class="noCalculatorButton"></div>
+        <div class="calculatorButton" v-on:click="num7">7</div>
+        <div class="calculatorButton" v-on:click="num8">8</div>
+        <div class="calculatorButton" v-on:click="num9">9</div>
+        <div class="noCalculatorButton"></div>
+        <div class="calculatorButton" v-on:click="num4">4</div>
+        <div class="calculatorButton" v-on:click="num5">5</div>
+        <div class="calculatorButton" v-on:click="num6">6</div>
+        <div class="calculatorButton" v-on:click="minus">&#x2212;</div>
+        <div class="calculatorButton" v-on:click="num1">1</div>
+        <div class="calculatorButton" v-on:click="num2">2</div>
+        <div class="calculatorButton" v-on:click="num3">3</div>        
+        <div class="calculatorButton" v-on:click="plus">+</div>
+        <div class="calculatorButton" v-on:click="negate">&#x2213;</div>
+        <div class="calculatorButton" v-on:click="num0">0</div>
+        <div class="calculatorButton" v-on:click="separator">:</div>
+        <div class="calculatorButton" v-on:click="equal">=</div>
       </div>
     </div>
 </template>
@@ -36,20 +36,41 @@ import { CalculatorTimeFormat, Calculation, Operations, TimeValue, Operator } fr
 
 @Component
 export default class Calculator extends Vue {
-  private _overwriteDisplay = false;
+    private _overwriteDisplay = false;
     private _hasPressedNumber = false;
     private _separatorSetExplicitly = false;
 
     public CalculatorType: CalculatorTimeFormat = CalculatorTimeFormat.HoursAndMinutes;
 
-    private _currentCalculation: Calculation = new Calculation();
-    public get CurrentCalculation(): string { return this._currentCalculation.toString(); }
+    private CurrentCalculation = new Calculation();
+    //public get CurrentCalculation(): string { return this._currentCalculation ? this._currentCalculation.toString() : ''; }
+    private get currentCalculationDisplay(): string {
+        let display = '';
+        for(const part of this.CurrentCalculation) {
+            if(part instanceof Operator) {
+                display += part.toString();
+            } else {
+                display += this.formatCalculation(part.toString());
+            }
+        }
+
+        return display;
+    }
 
     public CalculatorDisplay = '';
 
+    constructor() {
+        super();
+        this._overwriteDisplay = false;
+        this._hasPressedNumber = false;
+        this._separatorSetExplicitly = false;
+        this.CalculatorType = CalculatorTimeFormat.HoursAndMinutes;
+        this.CurrentCalculation = new Calculation();
+    }
+
     private changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
         this.CalculatorType = timeFormat;
-        this._currentCalculation.changeTimeFormat(timeFormat);
+        this.CurrentCalculation.changeTimeFormat(timeFormat);
 
         if (this.CalculatorDisplay !== '') {
             if (timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
@@ -219,23 +240,23 @@ export default class Calculator extends Vue {
 
     private calculate(op: Operations): void {
         if (op === Operations.add || op === Operations.substract) {
-            this._currentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
-            this._currentCalculation.push(new Operator(op));
+            this.CurrentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
+            this.CurrentCalculation.push(new Operator(op));
             this.performCalculation();
         } else {
             if (this._hasPressedNumber === true) {
-                this._currentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
+                this.CurrentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
             }
 
             this.performCalculation();
-            this._currentCalculation = new Calculation();
+            this.CurrentCalculation = new Calculation();
         }
 
         this._hasPressedNumber = false;
     }
 
     private performCalculation(): void {
-        const result = this._currentCalculation.calculate();
+        const result = this.CurrentCalculation.calculate();
         this.CalculatorDisplay = this.formatCalculation(result);
         this._overwriteDisplay = true;
         this._separatorSetExplicitly = false;
@@ -305,7 +326,7 @@ export default class Calculator extends Vue {
         this._separatorSetExplicitly = false;
     }
     public clearAll(): void {
-        this._currentCalculation = new Calculation();
+        this.CurrentCalculation = new Calculation();
         this.CalculatorDisplay = '';
         this._hasPressedNumber = false;
         this._overwriteDisplay = false;
@@ -361,31 +382,43 @@ export default class Calculator extends Vue {
     public equal(): void {
         this.calculate(Operations.eq);
     }
+    public keyUp(event: KeyboardEvent): void {
+        switch(event.code) {
+            case '49':
+            case '97':
+                this.num1();
+                break;
+            case '50':
+            case '98':
+                this.num2();
+                break;
+        }
+    }
     //#endregion
 }
 </script>
 
 <style lang="css" scoped>
-#calculator {
+.calculator {
   background-color: green;
   height: 100%;
   display: grid;
   grid-template-rows: 1fr 1.75fr;
 }
 
-#calculatorDisplayContainer {
+.calculatorDisplayContainer {
   display: grid;
   grid-template-rows: 1fr 2fr;
 }
 
-#currentCalculation {
+.currentCalculation {
   background-color: white;
   border: none;
   font-size: 32px;
   text-align: right;
 }
 
-#calculatorDisplay {
+.calculatorDisplay {
   background-color: white;
   border: none;
   font-size: 60px;
@@ -394,7 +427,7 @@ export default class Calculator extends Vue {
   color: black;
 }
 
-#calculatorPad {
+.calculatorPad {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
@@ -407,5 +440,9 @@ export default class Calculator extends Vue {
   justify-content: center;
   position: relative;
   background-color: #efefef;
+}
+
+.noCalculatorButton {
+    background-color: #dedede;
 }
 </style>

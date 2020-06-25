@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export interface CalculationPart {
-    dumb(): void;
+    toString(): string;
 }
 
 export enum CalculatorTimeFormat {
@@ -80,8 +80,8 @@ export class TimeValue implements CalculationPart {
         }
     }
 
-    public dumb(): void {
-        console.log('');
+    public toString(): string {
+        return this.value.toISOString();
     }
 }
 
@@ -113,8 +113,17 @@ export class Operator implements CalculationPart {
         }
     }
 
-    public dumb(): void {
-        console.log('');
+    public toString(): string {
+        switch(this.op) {
+            case Operations.add:
+                return '+';
+            case Operations.substract:
+                return '-';
+            case Operations.eq:
+                return '=';
+            default:
+                return '';
+        }
     }
 }
 
@@ -156,5 +165,15 @@ export class Calculation extends Array<CalculationPart> {
                 part.changeTimeFormat(timeFormat);
             }
         }
+    }
+
+    public toString(): string {
+        let str = '';
+        
+        for (const part of this) {
+            str += part.toString();
+        }
+
+        return str;
     }
 }
