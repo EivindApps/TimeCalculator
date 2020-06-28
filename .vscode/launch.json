@@ -12,14 +12,14 @@
         "webRoot": "${workspaceFolder}"
     },
         {
-            "command": "npm test",
-            "name": "Run npm test",
+            "command": "npm run test:unit",
+            "name": "Run vue-cli-service test:unit",
             "request": "launch",
             "type": "node-terminal"
         },
         {
-            "command": "npm start",
-            "name": "Run npm start",
+            "command": "npm run serve",
+            "name": "Run vue-cli-service serve",
             "request": "launch",
             "type": "node-terminal"
         },
