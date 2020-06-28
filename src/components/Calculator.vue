@@ -1,30 +1,30 @@
 <template>
   <div class="calculator" v-on:keyup="keyUp($event)">
-      <div class="calculatorDisplayContainer">
-        <input type="text" class="currentCalculation" disabled v-model="this.currentCalculationDisplay" />
-        <input type="text" class="calculatorDisplay" disabled v-model="this.CalculatorDisplay" />
+      <div class="calculator-display-container">
+        <input type="text" class="current-calculation" disabled v-model="this.currentCalculationDisplay" />
+        <input type="text" class="calculator-display" disabled v-model="this.CalculatorDisplay" />
       </div>
-      <div class="calculatorPad">
-        <div class="calculatorButton" v-on:click="clearDisplay">CE</div>
-        <div class="calculatorButton" v-on:click="clearAll">C</div>
-        <div class="calculatorButton" v-on:click="backspace">&#x21A4;</div>
-        <div class="noCalculatorButton"></div>
-        <div class="calculatorButton" v-on:click="num7">7</div>
-        <div class="calculatorButton" v-on:click="num8">8</div>
-        <div class="calculatorButton" v-on:click="num9">9</div>
-        <div class="noCalculatorButton"></div>
-        <div class="calculatorButton" v-on:click="num4">4</div>
-        <div class="calculatorButton" v-on:click="num5">5</div>
-        <div class="calculatorButton" v-on:click="num6">6</div>
-        <div class="calculatorButton" v-on:click="minus">&#x2212;</div>
-        <div class="calculatorButton" v-on:click="num1">1</div>
-        <div class="calculatorButton" v-on:click="num2">2</div>
-        <div class="calculatorButton" v-on:click="num3">3</div>        
-        <div class="calculatorButton" v-on:click="plus">+</div>
-        <div class="calculatorButton" v-on:click="negate">&#x2213;</div>
-        <div class="calculatorButton" v-on:click="num0">0</div>
-        <div class="calculatorButton" v-on:click="separator">:</div>
-        <div class="calculatorButton" v-on:click="equal">=</div>
+      <div class="calculator-pad">
+        <div class="calculator-button" v-on:click="clearDisplay">CE</div>
+        <div class="calculator-button" v-on:click="clearAll">C</div>
+        <div class="calculator-button" v-on:click="backspace">&#x21A4;</div>
+        <div class="no-calculator-button"></div>
+        <div class="calculator-button" v-on:click="num7">7</div>
+        <div class="calculator-button" v-on:click="num8">8</div>
+        <div class="calculator-button" v-on:click="num9">9</div>
+        <div class="no-calculator-button"></div>
+        <div class="calculator-button" v-on:click="num4">4</div>
+        <div class="calculator-button" v-on:click="num5">5</div>
+        <div class="calculator-button" v-on:click="num6">6</div>
+        <div class="calculator-button" v-on:click="minus">&#x2212;</div>
+        <div class="calculator-button" v-on:click="num1">1</div>
+        <div class="calculator-button" v-on:click="num2">2</div>
+        <div class="calculator-button" v-on:click="num3">3</div>        
+        <div class="calculator-button" v-on:click="plus">+</div>
+        <div class="calculator-button" v-on:click="negate">&#x2213;</div>
+        <div class="calculator-button" v-on:click="num0">0</div>
+        <div class="calculator-button" v-on:click="separator">:</div>
+        <div class="calculator-button" v-on:click="equal">=</div>
       </div>
     </div>
 </template>
@@ -406,19 +406,19 @@ export default class Calculator extends Vue {
   grid-template-rows: 1fr 1.75fr;
 }
 
-.calculatorDisplayContainer {
+.calculator-display-container {
   display: grid;
   grid-template-rows: 1fr 2fr;
 }
 
-.currentCalculation {
+.current-calculation {
   background-color: white;
   border: none;
   font-size: 32px;
   text-align: right;
 }
 
-.calculatorDisplay {
+.calculator-display {
   background-color: white;
   border: none;
   font-size: 60px;
@@ -427,12 +427,12 @@ export default class Calculator extends Vue {
   color: black;
 }
 
-.calculatorPad {
+.calculator-pad {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
 
-.calculatorButton {
+.calculator-button {
   display: flex;
   font-size: 26px;
   font-weight: bold;
@@ -442,7 +442,7 @@ export default class Calculator extends Vue {
   background-color: #efefef;
 }
 
-.noCalculatorButton {
+.no-calculator-button {
     background-color: #dedede;
 }
 </style>
