@@ -61,13 +61,12 @@ export default class Calculator extends Vue {
 
     public calculatorDisplay = '';
 
-    constructor() {
-        super();
+    created() {
         this._overwriteDisplay = false;
         this._hasPressedNumber = false;
         this._separatorSetExplicitly = false;
         this.calculatorType = CalculatorTimeFormat.HoursAndMinutes;
-        this._currentCalculation = new Calculation();
+        this._currentCalculation = new Calculation();        
     }
 
     private changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
