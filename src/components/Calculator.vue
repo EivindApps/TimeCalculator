@@ -2,7 +2,7 @@
   <div class="calculator" v-on:keyup="keyUp($event)">
       <div class="calculator-display-container">
         <input type="text" class="current-calculation" disabled v-model="this.currentCalculationDisplay" />
-        <input type="text" class="calculator-display" disabled v-model="this.CalculatorDisplay" />
+        <input type="text" class="calculator-display" disabled v-model="this.calculatorDisplay" />
       </div>
       <div class="calculator-pad">
         <div class="calculator-button" v-on:click="clearDisplay">CE</div>
@@ -40,13 +40,13 @@ export default class Calculator extends Vue {
     private _hasPressedNumber = false;
     private _separatorSetExplicitly = false;
 
-    public CalculatorType: CalculatorTimeFormat = CalculatorTimeFormat.HoursAndMinutes;
+    public calculatorType: CalculatorTimeFormat = CalculatorTimeFormat.HoursAndMinutes;
 
-    private CurrentCalculation = new Calculation();
+    private currentCalculation = new Calculation();
     //public get CurrentCalculation(): string { return this._currentCalculation ? this._currentCalculation.toString() : ''; }
     private get currentCalculationDisplay(): string {
         let display = '';
-        for(const part of this.CurrentCalculation) {
+        for(const part of this.currentCalculation) {
             if(part instanceof Operator) {
                 display += part.toString();
             } else {
@@ -57,33 +57,33 @@ export default class Calculator extends Vue {
         return display;
     }
 
-    public CalculatorDisplay = '';
+    public calculatorDisplay = '';
 
     constructor() {
         super();
         this._overwriteDisplay = false;
         this._hasPressedNumber = false;
         this._separatorSetExplicitly = false;
-        this.CalculatorType = CalculatorTimeFormat.HoursAndMinutes;
-        this.CurrentCalculation = new Calculation();
+        this.calculatorType = CalculatorTimeFormat.HoursAndMinutes;
+        this.currentCalculation = new Calculation();
     }
 
     private changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
-        this.CalculatorType = timeFormat;
-        this.CurrentCalculation.changeTimeFormat(timeFormat);
+        this.calculatorType = timeFormat;
+        this.currentCalculation.changeTimeFormat(timeFormat);
 
-        if (this.CalculatorDisplay !== '') {
+        if (this.calculatorDisplay !== '') {
             if (timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
                 // Remove seconds part of the current display
-                const parts = this.CalculatorDisplay.split(':');
+                const parts = this.calculatorDisplay.split(':');
 
                 if (parts.length === 3) {
-                    this.CalculatorDisplay = this.CalculatorDisplay.substr(0, this.CalculatorDisplay.lastIndexOf(':'));
+                    this.calculatorDisplay = this.calculatorDisplay.substr(0, this.calculatorDisplay.lastIndexOf(':'));
                 }
             } else {
                 if (this._overwriteDisplay === true) {
                     // Add seconds part to the current display
-                    this.CalculatorDisplay += ':00';
+                    this.calculatorDisplay += ':00';
                 }
             }
         }
@@ -91,20 +91,20 @@ export default class Calculator extends Vue {
 
     private numberPressed(value: number): void {
         if (this._overwriteDisplay === true) {
-            this.CalculatorDisplay = '';
+            this.calculatorDisplay = '';
             this._overwriteDisplay = false;
         }
 
-        if (this.CalculatorDisplay !== '') {
-            const isNegated = this.CalculatorDisplay.startsWith('-');
+        if (this.calculatorDisplay !== '') {
+            const isNegated = this.calculatorDisplay.startsWith('-');
 
-            if (this.CalculatorType === CalculatorTimeFormat.HoursAndMinutes) {
+            if (this.calculatorType === CalculatorTimeFormat.HoursAndMinutes) {
                 this.numberPressedInHoursAndMinutesMode(isNegated, value);
             } else {
                 this.numberPressedInSecondsMode(isNegated, value);
             }
         } else {
-            this.CalculatorDisplay = value.toString();
+            this.calculatorDisplay = value.toString();
         }
 
         this._hasPressedNumber = true;
@@ -112,15 +112,15 @@ export default class Calculator extends Vue {
 
     private numberPressedInHoursAndMinutesMode(isNegated: boolean, value: number): void {
         if (this._separatorSetExplicitly === true) {
-            const parts = this.CalculatorDisplay.split(':');
+            const parts = this.calculatorDisplay.split(':');
 
             if (parts.length === 2 && parts[1].length >= 2) {
                 return;  // Cannot have more than two digits representing minutes
             }
 
-            this.CalculatorDisplay += value.toString();
+            this.calculatorDisplay += value.toString();
         } else {
-            let temp = this.CalculatorDisplay.replace(':', '') + value.toString();
+            let temp = this.calculatorDisplay.replace(':', '') + value.toString();
             temp = temp.replace('-', '');
             let hoursPart = '', minutesPart = '';
 
@@ -143,13 +143,13 @@ export default class Calculator extends Vue {
                 temp += minutesPart;
             }
 
-            this.CalculatorDisplay = temp;
+            this.calculatorDisplay = temp;
         }
     }
 
     private numberPressedInSecondsMode(isNegated: boolean, value: number): void {
         if (this._separatorSetExplicitly === true) {
-            const parts = this.CalculatorDisplay.split(':');
+            const parts = this.calculatorDisplay.split(':');
 
             if (parts.length === 3 && parts[2].length >= 2) {
                 return;  // Cannot have more than two digits representing seconds
@@ -161,7 +161,7 @@ export default class Calculator extends Vue {
                 }
 
                 temp += value.toString();
-                this.CalculatorDisplay = temp;
+                this.calculatorDisplay = temp;
             } else if (parts.length === 1 && parts[0].length >= 2) {
                 let temp = parts[0].substr(0, 2) + ':';
 
@@ -170,12 +170,12 @@ export default class Calculator extends Vue {
                 }
 
                 temp += value.toString();
-                this.CalculatorDisplay = temp;
+                this.calculatorDisplay = temp;
             } else {
-                this.CalculatorDisplay += value.toString();
+                this.calculatorDisplay += value.toString();
             }
         } else {
-            let temp = this.CalculatorDisplay.replace(':', '') + value.toString();
+            let temp = this.calculatorDisplay.replace(':', '') + value.toString();
             temp = temp.replace('-', '');
             let hoursPart =  '', minutesPart = '', secondsPart = '';
 
@@ -204,21 +204,21 @@ export default class Calculator extends Vue {
                 temp += secondsPart;
             }
 
-            this.CalculatorDisplay = temp;
+            this.calculatorDisplay = temp;
         }
     }
 
     private separatorPressed(): void {
-        if (this.CalculatorDisplay === '' || this._overwriteDisplay === true) {
-            this.CalculatorDisplay = '0:';
+        if (this.calculatorDisplay === '' || this._overwriteDisplay === true) {
+            this.calculatorDisplay = '0:';
         } else {
-            if (this.CalculatorType === CalculatorTimeFormat.HoursAndMinutes) {
-                this.CalculatorDisplay = this.CalculatorDisplay.replace(':', '') + ':';
+            if (this.calculatorType === CalculatorTimeFormat.HoursAndMinutes) {
+                this.calculatorDisplay = this.calculatorDisplay.replace(':', '') + ':';
             } else {
-                const parts = this.CalculatorDisplay.split(':');
+                const parts = this.calculatorDisplay.split(':');
 
                 if (parts.length === 1) {
-                    this.CalculatorDisplay = parts[0] + ':';
+                    this.calculatorDisplay = parts[0] + ':';
                 } else if (parts.length === 2) {
                     let temp = parts[0] + ':';
 
@@ -229,7 +229,7 @@ export default class Calculator extends Vue {
                     }
 
                     temp += ':';
-                    this.CalculatorDisplay = temp;
+                    this.calculatorDisplay = temp;
                 }
             }
         }
@@ -240,24 +240,24 @@ export default class Calculator extends Vue {
 
     private calculate(op: Operations): void {
         if (op === Operations.add || op === Operations.substract) {
-            this.CurrentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
-            this.CurrentCalculation.push(new Operator(op));
+            this.currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
+            this.currentCalculation.push(new Operator(op));
             this.performCalculation();
         } else {
             if (this._hasPressedNumber === true) {
-                this.CurrentCalculation.push(new TimeValue(this.CalculatorDisplay, this.CalculatorType));
+                this.currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
             }
 
             this.performCalculation();
-            this.CurrentCalculation = new Calculation();
+            this.currentCalculation = new Calculation();
         }
 
         this._hasPressedNumber = false;
     }
 
     private performCalculation(): void {
-        const result = this.CurrentCalculation.calculate();
-        this.CalculatorDisplay = this.formatCalculation(result);
+        const result = this.currentCalculation.calculate();
+        this.calculatorDisplay = this.formatCalculation(result);
         this._overwriteDisplay = true;
         this._separatorSetExplicitly = false;
     }
@@ -278,7 +278,7 @@ export default class Calculator extends Vue {
             return '0' + str;
         }
 
-        if (this.CalculatorType === CalculatorTimeFormat.HoursAndMinutes) {
+        if (this.calculatorType === CalculatorTimeFormat.HoursAndMinutes) {
             return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.asHours.toString()) + ':' + formatAsTwoDigits(durationValue.minutes.toString());
         }
 
@@ -320,20 +320,20 @@ export default class Calculator extends Vue {
         this.separatorPressed();
     }
     public clearDisplay(): void {
-        this.CalculatorDisplay = '';
+        this.calculatorDisplay = '';
         this._hasPressedNumber = false;
         this._overwriteDisplay = false;
         this._separatorSetExplicitly = false;
     }
     public clearAll(): void {
-        this.CurrentCalculation = new Calculation();
-        this.CalculatorDisplay = '';
+        this.currentCalculation = new Calculation();
+        this.calculatorDisplay = '';
         this._hasPressedNumber = false;
         this._overwriteDisplay = false;
         this._separatorSetExplicitly = false;
     }
     public backspace(): void {
-        let temp = this.CalculatorDisplay;
+        let temp = this.calculatorDisplay;
 
         if (temp !== '') {
             if (temp.lastIndexOf(':') == (temp.length - 1)) {
@@ -348,16 +348,16 @@ export default class Calculator extends Vue {
                 temp = temp.substr(0, temp.length - 1);
             }
 
-            this.CalculatorDisplay = temp;
+            this.calculatorDisplay = temp;
             this._overwriteDisplay = false;
 
-            if (this.CalculatorDisplay === '') {
+            if (this.calculatorDisplay === '') {
                 this._hasPressedNumber = false;
             }
         }
     }
     public negate(): void {
-        let temp = this.CalculatorDisplay;
+        let temp = this.calculatorDisplay;
 
         if (temp !== '') {
             if (temp.startsWith('-')) {
@@ -369,7 +369,7 @@ export default class Calculator extends Vue {
             temp = '-';
         }
 
-        this.CalculatorDisplay = temp;
+        this.calculatorDisplay = temp;
         this._overwriteDisplay = false;
         this._hasPressedNumber = true;
     }
