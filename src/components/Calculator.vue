@@ -1,8 +1,8 @@
 <template>
   <div class="calculator" v-on:keyup="keyUp($event)">
       <div class="calculator-display-container">
-        <input type="text" class="current-calculation" disabled v-model="this.currentCalculationDisplay" />
-        <input type="text" class="calculator-display" disabled v-model="this.calculatorDisplay" />
+        <input type="text" class="current-calculation" disabled :value="this.currentCalculationDisplay" />
+        <input type="text" class="calculator-display" disabled :value="this.calculatorDisplay" />
       </div>
       <div class="calculator-pad">
         <div class="calculator-button" v-on:click="clearDisplay">CE</div>
@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import 'reflect-metadata';
+import { Component, Prop, PropSync, Provide, Emit, Vue, Watch } from 'vue-property-decorator';
 import moment from 'moment';
 import { CalculatorTimeFormat, Calculation, Operations, TimeValue, Operator } from "../Model";
 
@@ -42,11 +43,12 @@ export default class Calculator extends Vue {
 
     public calculatorType: CalculatorTimeFormat = CalculatorTimeFormat.HoursAndMinutes;
 
-    private currentCalculation = new Calculation();
+    private _currentCalculation = new Calculation();
     //public get CurrentCalculation(): string { return this._currentCalculation ? this._currentCalculation.toString() : ''; }
-    private get currentCalculationDisplay(): string {
+    
+    currentCalculationDisplay(): string {
         let display = '';
-        for(const part of this.currentCalculation) {
+        for(const part of this._currentCalculation) {
             if(part instanceof Operator) {
                 display += part.toString();
             } else {
@@ -65,12 +67,12 @@ export default class Calculator extends Vue {
         this._hasPressedNumber = false;
         this._separatorSetExplicitly = false;
         this.calculatorType = CalculatorTimeFormat.HoursAndMinutes;
-        this.currentCalculation = new Calculation();
+        this._currentCalculation = new Calculation();
     }
 
     private changeTimeFormat(timeFormat: CalculatorTimeFormat): void {
         this.calculatorType = timeFormat;
-        this.currentCalculation.changeTimeFormat(timeFormat);
+        this._currentCalculation.changeTimeFormat(timeFormat);
 
         if (this.calculatorDisplay !== '') {
             if (timeFormat === CalculatorTimeFormat.HoursAndMinutes) {
@@ -240,23 +242,23 @@ export default class Calculator extends Vue {
 
     private calculate(op: Operations): void {
         if (op === Operations.add || op === Operations.substract) {
-            this.currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
-            this.currentCalculation.push(new Operator(op));
+            this._currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
+            this._currentCalculation.push(new Operator(op));
             this.performCalculation();
         } else {
             if (this._hasPressedNumber === true) {
-                this.currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
+                this._currentCalculation.push(new TimeValue(this.calculatorDisplay, this.calculatorType));
             }
 
             this.performCalculation();
-            this.currentCalculation = new Calculation();
+            this._currentCalculation = new Calculation();
         }
 
         this._hasPressedNumber = false;
     }
 
     private performCalculation(): void {
-        const result = this.currentCalculation.calculate();
+        const result = this._currentCalculation.calculate();
         this.calculatorDisplay = this.formatCalculation(result);
         this._overwriteDisplay = true;
         this._separatorSetExplicitly = false;
@@ -279,10 +281,10 @@ export default class Calculator extends Vue {
         }
 
         if (this.calculatorType === CalculatorTimeFormat.HoursAndMinutes) {
-            return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.asHours.toString()) + ':' + formatAsTwoDigits(durationValue.minutes.toString());
+            return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.hours().toString()) + ':' + formatAsTwoDigits(durationValue.minutes().toString());
         }
 
-        return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.asHours.toString()) + ':' + formatAsTwoDigits(durationValue.minutes.toString() + ':' + formatAsTwoDigits(durationValue.seconds.toString()));
+        return (isNeagtive ? '-' : '') + formatAsTwoDigits(durationValue.hours().toString()) + ':' + formatAsTwoDigits(durationValue.minutes().toString() + ':' + formatAsTwoDigits(durationValue.seconds().toString()));
     }
 
     //#region Keypad
@@ -326,7 +328,7 @@ export default class Calculator extends Vue {
         this._separatorSetExplicitly = false;
     }
     public clearAll(): void {
-        this.currentCalculation = new Calculation();
+        this._currentCalculation = new Calculation();
         this.calculatorDisplay = '';
         this._hasPressedNumber = false;
         this._overwriteDisplay = false;
